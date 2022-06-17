@@ -16,7 +16,7 @@ def cv_imread(filePath):
     cv_img = cv2.imdecode(np.fromfile(filePath, dtype=np.uint8), cv2.IMREAD_UNCHANGED)
     return cv_img
 
-def element_config(rcnn_weights_path: str, rcnn_cfg_path: str):
+def element_config(rcnn_weights_path: str, rcnn_cfg_path: str, device='cuda'):
     '''
     Load element detector configurations
     :param rcnn_weights_path: path to rcnn weights
@@ -29,7 +29,8 @@ def element_config(rcnn_weights_path: str, rcnn_cfg_path: str):
     cfg.merge_from_file(rcnn_cfg_path)
     cfg.MODEL.WEIGHTS = rcnn_weights_path
     cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.3 # lower this threshold to report more boxes
-#     cfg.MODEL.DEVICE = 'cpu' # if you installed detectron2 for cpu version
+    if device == 'cpu':
+        cfg.MODEL.DEVICE = 'cpu' # if you installed detectron2 for cpu version
     
     # initialize model
     model = DefaultPredictor(cfg)

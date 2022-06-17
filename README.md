@@ -100,8 +100,9 @@ from phishintention.phishintention_main import element_recognition, phishpedia_c
 # use full model
 url = open("phishintention/datasets/test_sites/accounts.g.cdcde.com/info.txt").read().strip()
 screenshot_path = "phishintention/datasets/test_sites/accounts.g.cdcde.com/shot.png"
+device = 'cuda' # or device = 'cpu'
 cfg_path = None # None means use default config.yaml
-AWL_MODEL, CRP_CLASSIFIER, CRP_LOCATOR_MODEL, SIAMESE_MODEL, OCR_MODEL, SIAMESE_THRE, LOGO_FEATS, LOGO_FILES, DOMAIN_MAP_PATH = load_config(cfg_path)
+AWL_MODEL, CRP_CLASSIFIER, CRP_LOCATOR_MODEL, SIAMESE_MODEL, OCR_MODEL, SIAMESE_THRE, LOGO_FEATS, LOGO_FILES, DOMAIN_MAP_PATH = load_config(cfg_path, device)
 
 phish_category, pred_target, plotvis, siamese_conf, dynamic, _, pred_boxes, pred_classes = test(url, screenshot_path,
                                                                       AWL_MODEL, CRP_CLASSIFIER, CRP_LOCATOR_MODEL, SIAMESE_MODEL, OCR_MODEL, SIAMESE_THRE, LOGO_FEATS, LOGO_FILES, DOMAIN_MAP_PATH)

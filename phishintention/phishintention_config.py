@@ -34,7 +34,7 @@ def driver_loader():
 
 
 
-def load_config(cfg_path: Union[str, None] = None, reload_targetlist=False):
+def load_config(cfg_path: Union[str, None] = None, reload_targetlist=False, device='cuda'):
 
     #################### '''Default''' ####################
     if cfg_path is None:
@@ -44,7 +44,7 @@ def load_config(cfg_path: Union[str, None] = None, reload_targetlist=False):
         # element recognition model
         AWL_CFG_PATH = os.path.join(os.path.dirname(__file__), configs['AWL_MODEL']['CFG_PATH'].replace('/', os.sep))
         AWL_WEIGHTS_PATH = os.path.join(os.path.dirname(__file__), configs['AWL_MODEL']['WEIGHTS_PATH'].replace('/', os.sep))
-        AWL_CONFIG, AWL_MODEL = element_config(rcnn_weights_path=AWL_WEIGHTS_PATH, rcnn_cfg_path=AWL_CFG_PATH)
+        AWL_CONFIG, AWL_MODEL = element_config(rcnn_weights_path=AWL_WEIGHTS_PATH, rcnn_cfg_path=AWL_CFG_PATH, device=device)
 
         CRP_CLASSIFIER = credential_config(
             checkpoint=os.path.join(os.path.dirname(__file__), configs['CRP_CLASSIFIER']['WEIGHTS_PATH'].replace('/', os.sep)),
@@ -52,7 +52,8 @@ def load_config(cfg_path: Union[str, None] = None, reload_targetlist=False):
 
         CRP_LOCATOR_CONFIG, CRP_LOCATOR_MODEL = login_config(
             rcnn_weights_path=os.path.join(os.path.dirname(__file__), configs['CRP_LOCATOR']['WEIGHTS_PATH'].replace('/', os.sep)),
-            rcnn_cfg_path=os.path.join(os.path.dirname(__file__), configs['CRP_LOCATOR']['CFG_PATH'].replace('/', os.sep)))
+            rcnn_cfg_path=os.path.join(os.path.dirname(__file__), configs['CRP_LOCATOR']['CFG_PATH'].replace('/', os.sep)),
+            device=device)
 
         # siamese model
         print('Load protected logo list')
@@ -100,7 +101,7 @@ def load_config(cfg_path: Union[str, None] = None, reload_targetlist=False):
         # element recognition model
         AWL_CFG_PATH = configs['AWL_MODEL']['CFG_PATH']
         AWL_WEIGHTS_PATH = configs['AWL_MODEL']['WEIGHTS_PATH']
-        AWL_CONFIG, AWL_MODEL = element_config(rcnn_weights_path=AWL_WEIGHTS_PATH, rcnn_cfg_path=AWL_CFG_PATH)
+        AWL_CONFIG, AWL_MODEL = element_config(rcnn_weights_path=AWL_WEIGHTS_PATH, rcnn_cfg_path=AWL_CFG_PATH, device=device)
 
         CRP_CLASSIFIER = credential_config(
             checkpoint=configs['CRP_CLASSIFIER']['WEIGHTS_PATH'],
@@ -108,7 +109,8 @@ def load_config(cfg_path: Union[str, None] = None, reload_targetlist=False):
 
         CRP_LOCATOR_CONFIG, CRP_LOCATOR_MODEL = login_config(
             rcnn_weights_path=configs['CRP_LOCATOR']['WEIGHTS_PATH'],
-            rcnn_cfg_path=configs['CRP_LOCATOR']['CFG_PATH'])
+            rcnn_cfg_path=configs['CRP_LOCATOR']['CFG_PATH'],
+            device=device)
 
         # siamese model
         print('Load protected logo list')

@@ -225,9 +225,11 @@ if __name__ == "__main__":
     parser.add_argument('-f', "--folder", help='Input folder path to parse',  default='./datasets/test_sites')
     parser.add_argument('-r', "--results", help='Input results file name', default='./test_intention.txt')
     parser.add_argument('-c', "--config", help='Config file path', default=None)
+    parser.add_argument('-d', '--device', help='device', choices=['cuda', 'cpu'], required=True)
     args = parser.parse_args()
 
-    AWL_MODEL, CRP_CLASSIFIER, CRP_LOCATOR_MODEL, SIAMESE_MODEL, OCR_MODEL, SIAMESE_THRE, LOGO_FEATS, LOGO_FILES, DOMAIN_MAP_PATH = load_config(args.config)
+    AWL_MODEL, CRP_CLASSIFIER, CRP_LOCATOR_MODEL, SIAMESE_MODEL, OCR_MODEL, SIAMESE_THRE, LOGO_FEATS, LOGO_FILES, DOMAIN_MAP_PATH = load_config(args.config,
+                                                                                                                                                device=args.device)
     runit(args.folder, args.results, AWL_MODEL, CRP_CLASSIFIER, CRP_LOCATOR_MODEL, SIAMESE_MODEL, OCR_MODEL, SIAMESE_THRE, LOGO_FEATS, LOGO_FILES, DOMAIN_MAP_PATH)
 
 
