@@ -73,7 +73,7 @@ phishintention_config.py: phish-discovery experiment config file for PhishIntent
 phishintention_main.py: phish-discovery experiment evaluation script for PhishIntention
 ```
 
-## Requirements
+<!-- ## Requirements
 Tested with Windows/Linux
 
 python=3.7 
@@ -154,3 +154,4 @@ folder = "[the folder you want to label]"
 - We obtain feed from [Certstream phish_catcher](https://github.com/x0rz/phishing_catcher), we lower the score threshold to be 40 to process more suspicious websites, readers can refer to their repo for details
 - We use Scrapy for website crawling [Repo here](https://github.com/lindsey98/MyScrapy.git) 
 
+ -->
