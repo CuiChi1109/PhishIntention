@@ -57,12 +57,10 @@ src
                 |__ bit.pth.tar
     |___ util/: other scripts (chromedriver utilities)
     
-    |___ phishpedia_logo_detector/: training script for logo detector (for Phishpedia not PhishIntention)
     |___ phishpedia_siamese/: inference script for siamese (for Phishpedia not PhishIntention)
         |__ domain_map.pkl
         |__ expand_targetlist/
         
-    |___ adv_attack/: adversarial attacking scripts
     |___ layout_matcher/: deprecated scripts
     
     |___ AWL_detector.py: inference script for AWL detector
@@ -79,13 +77,12 @@ phishintention_main.py: phish-discovery experiment evaluation script for PhishIn
 
 
 ## Use it as a package
-- 1. Installing Git LFS (https://git-lfs.github.com/) to the machine you use
-- 2. Install the requirements
-   - python=3.7 
-   - Install torch, torchvision compatible with your CUDA version: https://pytorch.org/get-started/previous-versions/
+1. Installing Git LFS (https://git-lfs.github.com/) to the machine you use
+2. Install the requirements
+   - Create an environment with python=3.7 
+   - Install torch, torchvision compatible with your CUDA, see here: https://pytorch.org/get-started/previous-versions/
    - Install compatible Detectron2, see the [official installation guide](https://detectron2.readthedocs.io/en/latest/tutorials/install.html). If you are using Windows, try this [guide](https://dgmaxime.medium.com/how-to-easily-install-detectron2-on-windows-10-39186139101c) instead.
-
-- 3. Run
+3. Install PhishIntention by
 ```
  pip install git+https://github.com/lindsey98/PhishIntention.git
 ```
@@ -136,4 +133,14 @@ Please see detailed instructions in [phishintention/README.md](phishintention/RE
 - We also did not include the crawling script in this repo, readers can use [Selenium](https://selenium-python.readthedocs.io/), [Scrapy](https://github.com/scrapy/scrapy) or any web-crawling API to crawl the domains obtained from Cerstream, just make sure that the crawled websites are stored in [this format](https://github.com/lindsey98/Phishpedia/tree/main/datasets/test_sites)
 
 ## Contacts
+Please consider citing our work :)
+```
+@inproceedings{liu2022inferring,
+  title={Inferring Phishing Intention via Webpage Appearance and Dynamics: A Deep Vision Based Approach},
+  author={Liu, Ruofan and Lin, Yun and Yang, Xianglin and Ng, Siang Hwee and Divakaran, Dinil Mon and Dong, Jin Song},
+  booktitle={30th $\{$USENIX$\}$ Security Symposium ($\{$USENIX$\}$ Security 21)},
+  year={2022}
+}
+```
 If you have any issue running our code, you can raise an issue or send an email to liu.ruofan16@u.nus.edu, dcsliny@nus.eud.sg, and dcsdjs@nus.edu.sg
+
