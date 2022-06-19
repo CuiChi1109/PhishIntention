@@ -149,6 +149,7 @@ folder = "[the folder you want to label]"
 - 4. Go to **tele/**, Run **tele.py**
  -->
  
+ <!--
 ## Miscellaneous
 - In our paper, we also implement several phishing detection and identification baselines, see [here](https://github.com/lindsey98/PhishingBaseline)
 - We obtain feed from [Certstream phish_catcher](https://github.com/x0rz/phishing_catcher), we lower the score threshold to be 40 to process more suspicious websites, readers can refer to their repo for details
