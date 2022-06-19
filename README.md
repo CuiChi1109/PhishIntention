@@ -73,10 +73,7 @@ phishintention_config.py: phish-discovery experiment config file for PhishIntent
 phishintention_main.py: phish-discovery experiment evaluation script for PhishIntention
 ```
 
-## Requirements
-
-
-## Use it as a package
+## Instructions
 1. Installing Git LFS (https://git-lfs.github.com/) to the machine you use
 2. Install the requirements
    - Create an environment with python=3.7 
