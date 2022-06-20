@@ -74,7 +74,29 @@ phishintention_main.py: phish-discovery experiment evaluation script for PhishIn
 ```
 
 ## Instructions
-1. Installing Git LFS (https://git-lfs.github.com/) to the machine you use
+1. Installing Git LFS (https://git-lfs.github.com/), - :exclamation: Unfortunetaly, Git LFS has bandwidth limit every month, so if you meet the following error "pickle.UnpicklingError: invalid load key 'v'". You can try to download the models directly from [here](https://drive.google.com/drive/folders/1XGiLfIeSHwoeoXEpMXhMR4M2tkj3pErJ?usp=sharing): And then move the models to your PhishIntention package.
+Make sure that it follows this structure:
+```
+Under phishintention/phishintention/src
+  |___ AWL_detector_utils/: scripts for abstract layout detector 
+      |__ output/
+          |__ website_lr0.001/
+              |__ model_final.pth
+  |___ crp_classifier_utils/: scripts for CRP classifier
+          |__ output/
+              |__ Increase_resolution_lr0.005/
+                  |__ BiT-M-R50x1V2_0.005.pth.tar
+  |___ crp_locator_utils/: scripts for CRP locator 
+      |__ login_finder/
+          |__ output/
+              |__ lr0.001_finetune/
+                  |__ model_final.pth
+  |___ OCR_siamese_utils/: scripts for OCR-aided Siamese
+      |__ demo_downgrade.pth.tar
+      |__ output/
+          |__ targetlist_lr0.01/
+              |__ bit.pth.tar
+```
 2. Install the requirements
    - Create an environment with python=3.7 
    - Install torch, torchvision compatible with your CUDA, see here: https://pytorch.org/get-started/previous-versions/
@@ -125,29 +147,7 @@ Please see detailed instructions in [phishintention/README.md](phishintention/RE
 
 
 ## Miscellaneous
-- :exclamation::exclamation: Unfortunetaly, Git LFS has bandwidth limit every month, so if you meet the following error "pickle.UnpicklingError: invalid load key 'v'". You can try to download the models directly from [here](https://drive.google.com/drive/folders/1XGiLfIeSHwoeoXEpMXhMR4M2tkj3pErJ?usp=sharing): And then move the models to your PhishIntention package.
-Make sure that it follows this structure:
-```
-Under phishintention/phishintention/src
-  |___ AWL_detector_utils/: scripts for abstract layout detector 
-      |__ output/
-          |__ website_lr0.001/
-              |__ model_final.pth
-  |___ crp_classifier_utils/: scripts for CRP classifier
-          |__ output/
-              |__ Increase_resolution_lr0.005/
-                  |__ BiT-M-R50x1V2_0.005.pth.tar
-  |___ crp_locator_utils/: scripts for CRP locator 
-      |__ login_finder/
-          |__ output/
-              |__ lr0.001_finetune/
-                  |__ model_final.pth
-  |___ OCR_siamese_utils/: scripts for OCR-aided Siamese
-      |__ demo_downgrade.pth.tar
-      |__ output/
-          |__ targetlist_lr0.01/
-              |__ bit.pth.tar
-```
+
 - In our paper, we also implement several phishing detection and identification baselines, see [here](https://github.com/lindsey98/PhishingBaseline)
 - The phishing discovery crawling scripts is [here](https://github.com/lindsey98/MyScrapy/tree/main).
 
