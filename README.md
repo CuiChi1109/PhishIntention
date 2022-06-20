@@ -125,7 +125,7 @@ Please see detailed instructions in [phishintention/README.md](phishintention/RE
 
 
 ## Miscellaneous
- - :exclamation::exclamation: Unfortunetaly, Git LFS has bandwidth limit every month, so if you meet the following error "pickle.UnpicklingError: invalid load key 'v'". You can try to download the models directly from [here](https://drive.google.com/drive/folders/1XGiLfIeSHwoeoXEpMXhMR4M2tkj3pErJ?usp=sharing): And then move the models to your PhishIntention package.
+ - :exclamation::exclamation: Unfortunetaly, Git LFS has bandwidth limit every month, so if you meet the following error "pickle.UnpicklingError: invalid load key 'v'". You can try to download the models directly from [here](https://drive.google.com/drive/folders/1XGiLfIeSHwoeoXEpMXhMR4M2tkj3pErJ?usp=sharing): And then move the models to your **PhishIntention package**.
 Make sure that it follows this structure:
 ```
 Under phishintention/phishintention/src
