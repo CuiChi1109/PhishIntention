@@ -43,6 +43,7 @@ def test(url, screenshot_path, AWL_MODEL, CRP_CLASSIFIER, CRP_LOCATOR_MODEL, SIA
     dynamic_time = 0
     process_time = 0
 
+
     while True:
         # 0 for benign, 1 for phish, default is benign
         phish_category = 0
@@ -62,6 +63,15 @@ def test(url, screenshot_path, AWL_MODEL, CRP_CLASSIFIER, CRP_LOCATOR_MODEL, SIA
             print('No element is detected, report as benign')
             return phish_category, pred_target, plotvis, siamese_conf, dynamic, str(ele_detector_time)+'|'+str(siamese_time)+'|'+str(crp_time)+'|'+str(dynamic_time)+'|'+str(process_time), pred_boxes, pred_classes
         print('Entering siamese')
+
+        # domain already in targetlist
+        query_domain = tldextract.extract(url).domain
+        with open(DOMAIN_MAP_PATH, 'rb') as handle:
+            domain_map = pickle.load(handle)
+        existing_brands = domain_map.keys()
+        existing_domains = [y for x in list(domain_map.values()) for y in x]
+        if query_domain in existing_brands or query_domain in existing_domains:
+            return phish_category, pred_target, plotvis, siamese_conf, dynamic, str(ele_detector_time)+'|'+str(siamese_time)+'|'+str(crp_time)+'|'+str(dynamic_time)+'|'+str(process_time), pred_boxes, pred_classes
 
         ######################## Step2: Siamese (logo matcher) ########################################
         start_time = time.time()

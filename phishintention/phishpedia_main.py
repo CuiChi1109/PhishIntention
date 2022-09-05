@@ -45,6 +45,15 @@ def test(url, screenshot_path, AWL_MODEL, CRP_CLASSIFIER, CRP_LOCATOR_MODEL, SIA
         return phish_category, pred_target, plotvis, siamese_conf
     print('Entering siamese')
 
+    # domain already in targetlist
+    query_domain = tldextract.extract(url).domain
+    with open(DOMAIN_MAP_PATH, 'rb') as handle:
+        domain_map = pickle.load(handle)
+    existing_brands = domain_map.keys()
+    existing_domains = [y for x in list(domain_map.values()) for y in x]
+    if query_domain in existing_brands or query_domain in existing_domains:
+        return phish_category, pred_target, plotvis, siamese_conf
+
     ######################## Step2: Siamese (logo matcher) ########################################
     pred_target, matched_coord, siamese_conf = phishpedia_classifier_OCR(pred_classes=pred_classes,
                                                                          pred_boxes=pred_boxes,
