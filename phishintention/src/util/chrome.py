@@ -26,6 +26,10 @@ def initialize_chrome_settings(lang_txt:str):
     options = webdriver.ChromeOptions()
 
     options.add_experimental_option("prefs", prefs)
+    # Add those options for Linux users
+    options.add_argument('--no-sandbox')
+    options.add_argument('--disable-dev-shm-usage')
+    options.add_argument('--disable-gpu')
     options.add_argument('--ignore-certificate-errors') # ignore errors
     options.add_argument('--ignore-ssl-errors')
     # options.add_argument("--headless") # FIXME: do not disable browser (have some issues: https://github.com/mherrmann/selenium-python-helium/issues/47)
@@ -40,11 +44,7 @@ def initialize_chrome_settings(lang_txt:str):
     options.add_argument(
         'user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36')
     options.set_capability('unhandledPromptBehavior', 'dismiss') # dismiss
-
-    # Add those options for Linux users
-    options.add_argument('--no-sandbox')
-    options.add_argument('--disable-dev-shm-usage')
-    options.add_argument('--disable-gpu')
+    
     return  options
 
 def vt_scan(url_test):
