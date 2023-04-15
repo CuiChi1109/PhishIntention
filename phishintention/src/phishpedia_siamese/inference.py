@@ -38,27 +38,27 @@ def pred_siamese(img, model, imshow=False, title=None, grayscale=False):
         [transforms.ToTensor(),
          transforms.Normalize(mean=mean, std=std),
         ])
-    
+
     img = Image.open(img) if isinstance(img, str) else img
     img = img.convert("L").convert("RGB") if grayscale else img.convert("RGB")
 
     ## Resize the image while keeping the original aspect ratio
     pad_color = 255 if grayscale else (255, 255, 255)
     img = ImageOps.expand(img, (
-            (max(img.size) - img.size[0]) // 2, (max(img.size) - img.size[1]) // 2, 
-            (max(img.size) - img.size[0]) // 2, (max(img.size) - img.size[1]) // 2), fill=pad_color)     
- 
+            (max(img.size) - img.size[0]) // 2, (max(img.size) - img.size[1]) // 2,
+            (max(img.size) - img.size[0]) // 2, (max(img.size) - img.size[1]) // 2), fill=pad_color)
+
     img = img.resize((img_size, img_size))
-    
-    ## Plot the image    
-    if imshow: 
+
+    ## Plot the image
+    if imshow:
         if grayscale:
             plt.imshow(np.asarray(img), cmap='gray')
         else:
             plt.imshow(np.asarray(img))
         plt.title(title)
-        plt.show()   
-        
+        plt.show()
+
     # Predict the embedding
     with torch.no_grad():
         img = img_transforms(img)
@@ -66,7 +66,7 @@ def pred_siamese(img, model, imshow=False, title=None, grayscale=False):
 #         logo_feat = model.features(img).squeeze(-1).squeeze(-1)
         logo_feat = model.features(img)
         logo_feat = l2_norm(logo_feat).squeeze(0).cpu().numpy() # L2-normalization final shape is (2048,)
-        
+
     return logo_feat
 
 
@@ -80,15 +80,16 @@ def siamese_inference(model, domain_map, logo_feat_list, file_name_list, shot_pa
     :param logo_feat_list: reference logo feature embeddings
     :param file_name_list: reference logo paths
     :param shot_path: path to the screenshot
-    :param gt_bbox: 1x4 np.ndarray/list/tensor bounding box coords 
+    :param gt_bbox: 1x4 np.ndarray/list/tensor bounding box coords
     :param t_s: similarity threshold for siamese
     :param grayscale: convert image(cropped) to grayscale or not
     :return: predicted target, predicted target's domain
     '''
-    
+
     try:
         img = Image.open(shot_path)
     except OSError:  # if the image cannot be identified, return nothing
+        print("shot_path", shot_path)
         print('Screenshot cannot be open')
         return None, None, None
 
@@ -128,7 +129,7 @@ def siamese_inference(model, domain_map, logo_feat_list, file_name_list, shot_pa
             predicted_brand = top3_brandlist[j]
             predicted_domain = top3_domainlist[j]
             final_sim = top3_simlist[j]
-        
+
         ## Else if not exceed, try resolution alignment, see if can improve
         else:
             cropped, candidate_logo = resolution_alignment(cropped, top3_logolist[j])
@@ -250,6 +251,3 @@ def siamese_inference(model, domain_map, logo_feat_list, file_name_list, shot_pa
 #             print("Pass aspect ratio check")
 #             ######################################################################################
 #             return predicted_brand, predicted_domain
-
-
-

@@ -1,0 +1,2 @@
+folder	url	phish	prediction	siamese_conf	vt_result	dynamic	runtime (layout detector|siamese|crp classifier|login finder total|login finder process)	total_runtime
+www.paypal.com	https://www.paypal.com/hk/home	0	None	None	None	False	3.657905101776123|0|0|0|0	3.6721484661102295

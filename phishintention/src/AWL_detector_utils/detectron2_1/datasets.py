@@ -11,13 +11,15 @@ from detectron2.data import transforms as T
 from detectron2.data.datasets import register_coco_instances
 
 # Define dataset paths
-data_dir = Path("/home/l/liny/ruofan/PhishIntention/datasets")
+data_dir = Path("/home/chi/PhishIntention/awl_data")
 
 train_data_dir = data_dir / "train_imgs"
 val_data_dir = data_dir / "val_imgs"
 
 train_annot_file = data_dir / "train_coco.json"
 val_annot_file = data_dir / "val_coco.json"
+
+print("val_annot_file:", val_annot_file, val_data_dir)
 
 # Register benign train and test sets
 register_coco_instances("web_train", {}, train_annot_file, train_data_dir)

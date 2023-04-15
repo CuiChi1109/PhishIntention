@@ -17,7 +17,7 @@ def l2_norm(x):
         x = x.reshape((x.shape[0],-1))
     return F.normalize(x, p=2, dim=1)
 
-def pred_siamese_OCR(img, model, ocr_model, imshow=False, title=None, grayscale=False):
+def pred_siamese_OCR(img, model, ocr_model, imshow=True, title=None, grayscale=False):
     '''
     Inference for a single image with OCR enhanced model
     :param img_path: image path in str or image in PIL.Image
@@ -37,41 +37,41 @@ def pred_siamese_OCR(img, model, ocr_model, imshow=False, title=None, grayscale=
         [transforms.ToTensor(),
          transforms.Normalize(mean=mean, std=std),
         ])
-    
+
     img = Image.open(img) if isinstance(img, str) else img
     img = img.convert("RGBA").convert("L").convert("RGB") if grayscale else img.convert("RGBA").convert("RGB")
 
     ## Resize the image while keeping the original aspect ratio
     pad_color = 255 if grayscale else (255, 255, 255)
     img = ImageOps.expand(img, (
-            (max(img.size) - img.size[0]) // 2, (max(img.size) - img.size[1]) // 2, 
-            (max(img.size) - img.size[0]) // 2, (max(img.size) - img.size[1]) // 2), fill=pad_color)     
- 
+            (max(img.size) - img.size[0]) // 2, (max(img.size) - img.size[1]) // 2,
+            (max(img.size) - img.size[0]) // 2, (max(img.size) - img.size[1]) // 2), fill=pad_color)
+
     img = img.resize((img_size, img_size))
-    
-    ## Plot the image    
-    if imshow: 
+
+    ## Plot the image
+    if imshow:
         if grayscale:
             plt.imshow(np.asarray(img), cmap='gray')
         else:
             plt.imshow(np.asarray(img))
         plt.title(title)
-        plt.show()   
-        
-            
+        plt.show()
+
+
     with torch.no_grad():
         # get ocr embedding from pretrained paddleOCR
         ocr_emb = ocr_main(image_path=img, model=ocr_model, height=None, width=None)
         ocr_emb = ocr_emb[0]
         ocr_emb = ocr_emb[None, ...].to(device) # remove batch dimension
-        
+
     # Predict the embedding
     with torch.no_grad():
         img = img_transforms(img)
         img = img[None, ...].to(device)
         logo_feat = model.features(img, ocr_emb)
         logo_feat = l2_norm(logo_feat).squeeze(0).cpu().numpy() # L2-normalization final shape is (2560,)
-        
+
     return logo_feat
 
 
@@ -85,12 +85,12 @@ def siamese_inference_OCR(model, ocr_model,
     :param logo_feat_list: reference logo feature embeddings
     :param file_name_list: reference logo paths
     :param shot_path: path to the screenshot
-    :param gt_bbox: 1x4 np.ndarray/list/tensor bounding box coords 
+    :param gt_bbox: 1x4 np.ndarray/list/tensor bounding box coords
     :param t_s: similarity threshold for siamese
     :param grayscale: convert image(cropped) to grayscale or not
     :return: predicted target, predicted target's domain
     '''
-    
+
     try:
         img = Image.open(shot_path)
     except OSError:  # if the image cannot be identified, return nothing
@@ -101,13 +101,13 @@ def siamese_inference_OCR(model, ocr_model,
     cropped = img.crop((gt_bbox[0], gt_bbox[1], gt_bbox[2], gt_bbox[3]))
     img_feat = pred_siamese_OCR(cropped, model, ocr_model,
                                 imshow=False, title='Original rcnn box', grayscale=grayscale)
-
+    # print("img feat", img_feat)
     ## get cosine similarity with every protected logo
     # print(logo_feat_list.shape)
     # print(img_feat.shape)
     sim_list = logo_feat_list @ img_feat.T # take dot product for every pair of embeddings (Cosine Similarity)
     pred_brand_list = file_name_list
-    # print(pred_brand_list)
+    # print("[inf] pred_brand_list", pred_brand_list)
 
     assert len(sim_list) == len(pred_brand_list)
 
@@ -134,13 +134,13 @@ def siamese_inference_OCR(model, ocr_model,
             predicted_brand = top3_brandlist[j]
             predicted_domain = top3_domainlist[j]
             final_sim = top3_simlist[j]
-        
+
         ## Else if not exceed, try resolution alignment, see if can improve
         else:
             cropped, candidate_logo = resolution_alignment(cropped, top3_logolist[j])
-            img_feat = pred_siamese_OCR(cropped, model, ocr_model, 
+            img_feat = pred_siamese_OCR(cropped, model, ocr_model,
                                         imshow=False, title=None, grayscale=grayscale)
-            logo_feat = pred_siamese_OCR(candidate_logo, model, ocr_model, 
+            logo_feat = pred_siamese_OCR(candidate_logo, model, ocr_model,
                                          imshow=False, title=None, grayscale=grayscale)
             final_sim = logo_feat.dot(img_feat)
             if final_sim >= t_s:
@@ -161,5 +161,3 @@ def siamese_inference_OCR(model, ocr_model,
                 return predicted_brand, predicted_domain, final_sim
 
     return None, None, top3_simlist[0]
-
-

@@ -16,17 +16,29 @@ from torch import nn, optim
 from torch.backends import cudnn
 from torch.utils.data import DataLoader, SubsetRandomSampler
 
-from .config import get_args
-from .lib import datasets, evaluation_metrics, models
-from .lib.models.model_builder import ModelBuilder
-from .lib.datasets.dataset import LmdbDataset, AlignCollate
-from .lib.datasets.concatdataset import ConcatDataset
-from .lib.loss import SequenceCrossEntropyLoss
-from .lib.trainers import Trainer
-from .lib.evaluators import Evaluator
-from .lib.utils.logging import Logger, TFLogger
-from .lib.utils.serialization import load_checkpoint, save_checkpoint
-from .lib.utils.osutils import make_symlink_if_not_exists
+# from .config import get_args
+# from .lib import datasets, evaluation_metrics, models
+# from .lib.models.model_builder import ModelBuilder
+# from .lib.datasets.dataset import LmdbDataset, AlignCollate
+# from .lib.datasets.concatdataset import ConcatDataset
+# from .lib.loss import SequenceCrossEntropyLoss
+# from .lib.trainers import Trainer
+# from .lib.evaluators import Evaluator
+# from .lib.utils.logging import Logger, TFLogger
+# from .lib.utils.serialization import load_checkpoint, save_checkpoint
+# from .lib.utils.osutils import make_symlink_if_not_exists
+
+from config import get_args
+from lib import datasets, evaluation_metrics, models
+from lib.models.model_builder import ModelBuilder
+from lib.datasets.dataset import LmdbDataset, AlignCollate
+from lib.datasets.concatdataset import ConcatDataset
+from lib.loss import SequenceCrossEntropyLoss
+from lib.trainers import Trainer
+from lib.evaluators import Evaluator
+from lib.utils.logging import Logger, TFLogger
+from lib.utils.serialization import load_checkpoint, save_checkpoint
+from lib.utils.osutils import make_symlink_if_not_exists
 
 global_args = get_args(sys.argv[1:])
 
@@ -99,14 +111,14 @@ def main(args):
     torch.set_default_tensor_type('torch.cuda.FloatTensor')
   else:
     torch.set_default_tensor_type('torch.FloatTensor')
-  
+
   # Redirect print to both console and log file
-  if not args.evaluate:
-    # make symlink
-    make_symlink_if_not_exists(osp.join(args.real_logs_dir, args.logs_dir), osp.dirname(osp.normpath(args.logs_dir)))
-    sys.stdout = Logger(osp.join(args.logs_dir, 'log.txt'))
-    train_tfLogger = TFLogger(osp.join(args.logs_dir, 'train'))
-    eval_tfLogger = TFLogger(osp.join(args.logs_dir, 'eval'))
+  # if not args.evaluate:
+  #   # make symlink
+  #   make_symlink_if_not_exists(osp.join(args.real_logs_dir, args.logs_dir), osp.dirname(osp.normpath(args.logs_dir)))
+  #   sys.stdout = Logger(osp.join(args.logs_dir, 'log.txt'))
+  #   train_tfLogger = TFLogger(osp.join(args.logs_dir, 'train'))
+  #   eval_tfLogger = TFLogger(osp.join(args.logs_dir, 'eval'))
 
   # Save the args to disk
   if not args.evaluate:
@@ -120,7 +132,7 @@ def main(args):
   if args.height is None or args.width is None:
     args.height, args.width = (32, 100)
 
-  if not args.evaluate: 
+  if not args.evaluate:
     train_dataset, train_loader = \
       get_data(args.synthetic_train_data_dir, args.voc_type, args.max_len, args.num_train,
                args.height, args.width, args.batch_size, args.workers, True, args.keep_ratio)
@@ -160,7 +172,7 @@ def main(args):
     best_res = checkpoint['best_res']
     print("=> Start iters {}  best res {:.1%}"
           .format(start_iters, best_res))
-  
+
   if args.cuda:
     device = torch.device("cuda")
     model = model.to(device)
@@ -194,7 +206,7 @@ def main(args):
   loss_weights['loss_rec'] = 1.
   if args.debug:
     args.print_freq = 1
-  trainer = Trainer(model, args.evaluation_metric, args.logs_dir, 
+  trainer = Trainer(model, args.evaluation_metric, args.logs_dir,
                     iters=start_iters, best_res=best_res, grad_clip=args.grad_clip,
                     use_cuda=args.cuda, loss_weights=loss_weights)
 
@@ -205,10 +217,10 @@ def main(args):
     current_lr = optimizer.param_groups[0]['lr']
     trainer.train(epoch, train_loader, optimizer, current_lr,
                   print_freq=args.print_freq,
-                  train_tfLogger=train_tfLogger, 
+                  train_tfLogger=train_tfLogger,
                   is_debug=args.debug,
-                  evaluator=evaluator, 
-                  test_loader=test_loader, 
+                  evaluator=evaluator,
+                  test_loader=test_loader,
                   eval_tfLogger=eval_tfLogger,
                   test_dataset=test_dataset)
 

@@ -3,7 +3,8 @@ import os
 import sys
 import numpy as np
 import tensorflow as tf
-import scipy.misc 
+import scipy.misc
+from config import get_args
 try:
   from StringIO import StringIO  # Python 2.7
 except ImportError:
@@ -12,7 +13,7 @@ except ImportError:
 from .osutils import mkdir_if_missing
 
 # from config import get_args
-# global_args = get_args(sys.argv[1:])
+global_args = get_args(sys.argv[1:])
 
 # if global_args.run_on_remote:
 #   import moxing as mox
@@ -96,7 +97,7 @@ class TFLogger(object):
     summary = tf.Summary(value=img_summaries)
     self.writer.add_summary(summary, step)
     self.writer.flush()
-        
+
   def histo_summary(self, tag, values, step, bins=1000):
     """Log a histogram of the tensor of values."""
 

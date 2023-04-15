@@ -63,7 +63,7 @@ class GetLoader(data.Dataset):
 if __name__ == '__main__':
     import torchvision as tv
     import siamese_unified.bit_hyperrule as bit_hyperrule
-    
+
 
     # load OCR model
     ocr_model = ocr_model_config(checkpoint='/home/l/liny/ruofan/PhishIntention/src/OCR/demo.pth.tar')
@@ -93,4 +93,3 @@ if __name__ == '__main__':
         print(y.shape)
         print(emb.shape)
         break
-

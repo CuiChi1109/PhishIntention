@@ -22,7 +22,7 @@ def phishpedia_config(num_classes:int, weights_path:str, targetlist_path:str, gr
     :return logo_feat_list: targetlist embeddings
     :return file_name_list: targetlist paths
     '''
-    
+
     # Initialize model
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     model = KNOWN_MODELS["BiT-M-R50x1"](head_size=num_classes, zero_head=True)
@@ -36,7 +36,7 @@ def phishpedia_config(num_classes:int, weights_path:str, targetlist_path:str, gr
 #         name = k[7:]
         name = k.split('module.')[1]
         new_state_dict[name]=v
-        
+
     model.load_state_dict(new_state_dict)
     model.to(device)
     model.eval()
@@ -44,7 +44,7 @@ def phishpedia_config(num_classes:int, weights_path:str, targetlist_path:str, gr
 #     Prediction for targetlists
     logo_feat_list = []
     file_name_list = []
-    
+
     for target in tqdm(os.listdir(targetlist_path)):
         if target.startswith('.'): # skip hidden files
             continue
@@ -52,16 +52,16 @@ def phishpedia_config(num_classes:int, weights_path:str, targetlist_path:str, gr
             if logo_path.endswith('.png') or logo_path.endswith('.jpeg') or logo_path.endswith('.jpg') or logo_path.endswith('.PNG') or logo_path.endswith('.JPG') or logo_path.endswith('.JPEG'):
                 if logo_path.startswith('loginpage') or logo_path.startswith('homepage'): # skip homepage/loginpage
                     continue
-                logo_feat_list.append(pred_siamese(img=os.path.join(targetlist_path, target, logo_path), 
+                logo_feat_list.append(pred_siamese(img=os.path.join(targetlist_path, target, logo_path),
                                                    model=model, grayscale=grayscale))
                 file_name_list.append(str(os.path.join(targetlist_path, target, logo_path)))
-        
-    return model, np.asarray(logo_feat_list), np.asarray(file_name_list)   
 
-def phishpedia_classifier(pred_classes, pred_boxes, 
+    return model, np.asarray(logo_feat_list), np.asarray(file_name_list)
+
+def phishpedia_classifier(pred_classes, pred_boxes,
                           domain_map_path:str,
-                          model, logo_feat_list, file_name_list, shot_path:str, 
-                          url:str, 
+                          model, logo_feat_list, file_name_list, shot_path:str,
+                          url:str,
                           ts:float):
     '''
     Run siamese
@@ -80,14 +80,14 @@ def phishpedia_classifier(pred_classes, pred_boxes,
     # targetlist domain list
     with open(domain_map_path, 'rb') as handle:
         domain_map = pickle.load(handle)
-        
+
     # look at boxes for logo class only
     # print(pred_classes)
-    logo_boxes = pred_boxes[pred_classes==0] 
+    logo_boxes = pred_boxes[pred_classes==0]
 #     print('number of logo boxes:', len(logo_boxes))
     matched_coord = None
     siamese_conf = None
-    
+
     # run logo matcher
     pred_target = None
     if len(logo_boxes) > 0:
@@ -95,10 +95,10 @@ def phishpedia_classifier(pred_classes, pred_boxes,
         for i, coord in enumerate(logo_boxes):
             min_x, min_y, max_x, max_y = coord
             bbox = [float(min_x), float(min_y), float(max_x), float(max_y)]
-            target_this, domain_this, this_conf = siamese_inference(model, domain_map, 
+            target_this, domain_this, this_conf = siamese_inference(model, domain_map,
                                                          logo_feat_list, file_name_list,
                                                          shot_path, bbox, t_s=ts, grayscale=False)
-            
+
             # domain matcher to avoid FP
             if (target_this is not None) and (tldextract.extract(url).domain not in domain_this):
                 # avoid fp due to godaddy domain parking, ignore webmail provider (ambiguous)
@@ -114,7 +114,7 @@ def phishpedia_classifier(pred_classes, pred_boxes,
     return brand_converter(pred_target), matched_coord, siamese_conf
 
 
-def phishpedia_config_OCR(num_classes:int, weights_path:str, 
+def phishpedia_config_OCR(num_classes:int, weights_path:str,
                           ocr_weights_path:str,
                           targetlist_path:str, grayscale=False):
     '''
@@ -127,7 +127,7 @@ def phishpedia_config_OCR(num_classes:int, weights_path:str,
     :return logo_feat_list: targetlist embeddings
     :return file_name_list: targetlist paths
     '''
-    
+    # print("targetlist, phishpedia-config_OCR: ", targetlist_path)
     # load OCR model
     ocr_model = ocr_model_config(checkpoint=ocr_weights_path)
 
@@ -146,7 +146,7 @@ def phishpedia_config_OCR(num_classes:int, weights_path:str,
         else:
             name = k
         new_state_dict[name]=v
-        
+
     model.load_state_dict(new_state_dict)
     model.to(device)
     model.eval()
@@ -154,7 +154,7 @@ def phishpedia_config_OCR(num_classes:int, weights_path:str,
 #     Prediction for targetlists
     logo_feat_list = []
     file_name_list = []
-    
+
     for target in tqdm(os.listdir(targetlist_path)):
         if target.startswith('.'): # skip hidden files
             continue
@@ -162,11 +162,12 @@ def phishpedia_config_OCR(num_classes:int, weights_path:str,
             if logo_path.endswith('.png') or logo_path.endswith('.jpeg') or logo_path.endswith('.jpg') or logo_path.endswith('.PNG') or logo_path.endswith('.JPG') or logo_path.endswith('.JPEG'):
                 if logo_path.startswith('loginpage') or logo_path.startswith('homepage'): # skip homepage/loginpage
                     continue
-                logo_feat_list.append(pred_siamese_OCR(img=os.path.join(targetlist_path, target, logo_path), 
+                logo_feat_list.append(pred_siamese_OCR(img=os.path.join(targetlist_path, target, logo_path),
                                                        model=model, ocr_model=ocr_model,
                                                        grayscale=grayscale))
                 file_name_list.append(str(os.path.join(targetlist_path, target, logo_path)))
-        
+    # print("file_name_list: ", file_name_list)
+
     return model, ocr_model, np.asarray(logo_feat_list), np.asarray(file_name_list)
 
 
@@ -198,10 +199,10 @@ def phishpedia_config_OCR_easy(num_classes: int, weights_path: str,
     return model, ocr_model
 
 
-def phishpedia_classifier_OCR(pred_classes, pred_boxes, 
+def phishpedia_classifier_OCR(pred_classes, pred_boxes,
                           domain_map_path:str,
-                          model, ocr_model, logo_feat_list, file_name_list, shot_path:str, 
-                          url:str, 
+                          model, ocr_model, logo_feat_list, file_name_list, shot_path:str,
+                          url:str,
                           ts:float):
     '''
     Run siamese
@@ -221,14 +222,14 @@ def phishpedia_classifier_OCR(pred_classes, pred_boxes,
     # targetlist domain list
     with open(domain_map_path, 'rb') as handle:
         domain_map = pickle.load(handle)
-        
+
     # look at boxes for logo class only
     # print(pred_classes)
-    logo_boxes = pred_boxes[pred_classes==0] 
-#     print('number of logo boxes:', len(logo_boxes))
+    logo_boxes = pred_boxes[pred_classes==0]
+    # print('number of logo boxes:', len(logo_boxes))
     matched_coord = None
     siamese_conf = None
-    
+
     # run logo matcher
     pred_target = None
     if len(logo_boxes) > 0:
@@ -236,10 +237,10 @@ def phishpedia_classifier_OCR(pred_classes, pred_boxes,
         for i, coord in enumerate(logo_boxes):
             min_x, min_y, max_x, max_y = coord
             bbox = [float(min_x), float(min_y), float(max_x), float(max_y)]
-            target_this, domain_this, this_conf = siamese_inference_OCR(model, ocr_model, domain_map, 
+            target_this, domain_this, this_conf = siamese_inference_OCR(model, ocr_model, domain_map,
                                                          logo_feat_list, file_name_list,
                                                          shot_path, bbox, t_s=ts, grayscale=False)
-            
+            print(i)
             # domain matcher to avoid FP
             if (target_this is not None) and (tldextract.extract(url).domain not in domain_this):
                 # avoid fp due to godaddy domain parking, ignore webmail provider (ambiguous)
@@ -249,9 +250,12 @@ def phishpedia_classifier_OCR(pred_classes, pred_boxes,
                 pred_target = target_this
                 matched_coord = coord
                 siamese_conf = this_conf
+                # print("target ", target_this)
+                # print("conf ", this_conf)
                 break # break if target is matched
-            break # only look at 1st logo
+            # break # only look at 1st logo
 
+    # print("[PCO] pred_target", pred_target)
     return brand_converter(pred_target), matched_coord, siamese_conf
 
 
@@ -306,4 +310,3 @@ def phishpedia_classifier_logo(logo_boxes,
                 break
 
     return brand_converter(pred_target), matched_coord, siamese_conf
-

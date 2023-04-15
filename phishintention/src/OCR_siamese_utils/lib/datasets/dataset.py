@@ -27,11 +27,11 @@ from phishintention.src.OCR_siamese_utils.lib.utils import to_numpy
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 
-# from config import get_args
-# global_args = get_args(sys.argv[1:])
+from config import get_args
+global_args = get_args(sys.argv[1:])
 
-# if global_args.run_on_remote:
-#   import moxing as mox
+if global_args.run_on_remote:
+  import moxing as mox
 
 class LmdbDataset(data.Dataset):
   def __init__(self, root, voc_type, max_len, num_samples, transform=None):
@@ -46,7 +46,7 @@ class LmdbDataset(data.Dataset):
         mox.file.copy_parallel(root, data_cache_url)
       else:
         raise ValueError("%s not exists!" % root)
-      
+
       self.env = lmdb.open(data_cache_url, max_readers=32, readonly=True)
     else:
       self.env = lmdb.open(root, max_readers=32, readonly=True)

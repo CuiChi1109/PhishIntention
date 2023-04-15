@@ -19,7 +19,7 @@ from .lib.utils.labelmaps import get_vocabulary, labels2strs
 
 
 def image_process(image_path, imgH=32, imgW=100, keep_ratio=False, min_ratio=1):
-    
+
     img = Image.open(image_path).convert('RGB') if isinstance(image_path, str) else image_path.convert('RGB')
 
     if keep_ratio:
@@ -55,7 +55,7 @@ class DataInfo(object):
 
 
 def ocr_model_config(checkpoint, height=None, width=None):
-    
+
     np.random.seed(1234)
     torch.manual_seed(1234)
     torch.cuda.manual_seed(1234)
@@ -69,7 +69,7 @@ def ocr_model_config(checkpoint, height=None, width=None):
         torch.set_default_tensor_type('torch.cuda.FloatTensor')
     else:
         torch.set_default_tensor_type('torch.FloatTensor')
-  
+
     # Create data loaders
     if height is None or width is None:
         height, width = (32, 100)
@@ -87,33 +87,32 @@ def ocr_model_config(checkpoint, height=None, width=None):
 
     if device == 'cuda':
         model = model.to(device)
-        
+
     return model
 
 def ocr_main(image_path, model, height=None, width=None):
-    
+
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     # Evaluation
     model.eval()
-    
+
     img = image_process(image_path)
     with torch.no_grad():
         img = img.to(device)
     input_dict = {}
     input_dict['images'] = img.unsqueeze(0)
-    
+
     # TODO: testing should be more clean. to be compatible with the lmdb-based testing, need to construct some meaningless variables.
     dataset_info = DataInfo('ALLCASES_SYMBOLS')
     rec_targets = torch.IntTensor(1, 100).fill_(1)
     rec_targets[:,100-1] = dataset_info.char2id[dataset_info.EOS]
     input_dict['rec_targets'] = rec_targets.to(device)
     input_dict['rec_lengths'] = [100]
-    
+
     with torch.no_grad():
         features, decoder_feat = model.features(input_dict)
     features = features.detach().cpu()
     decoder_feat = decoder_feat.detach().cpu()
     features = torch.mean(features, dim=1)
-    
-    return features
 
+    return features
